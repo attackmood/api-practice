@@ -1,4 +1,4 @@
-package com.cantaur.api.model.member;
+package com.cantaur.api.model.tour;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,24 +7,22 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "관광지태그 DTO")
+@Schema(description = "태그 DTO")
 @Getter
 @Setter
-public class TouristSiteTag {
-
-  @Schema(description = "관광지일련번호", type = "Long")
-  private Long touristSiteUid;
+public class Tag {
 
   @Schema(description = "태그일련번호", type = "Long")
   private Long tagUid;
 
-  @Schema(description = "정렬순서", type = "Long")
-  private Long sortSeq;
-  
+  @Schema(description = "태그명", type = "String")
+  private String tagName;
+
   @JsonIgnore
   private LocalDateTime createdAt;
 
-
+  @JsonIgnore
+  private LocalDateTime changedAt;
 
 
 }

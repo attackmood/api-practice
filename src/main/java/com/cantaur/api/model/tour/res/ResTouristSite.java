@@ -1,4 +1,4 @@
-package com.cantaur.api.model.member.res;
+package com.cantaur.api.model.tour.res;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +20,7 @@ public class ResTouristSite {
   private String regionCode;
 
   @Schema(description = "지역명", type = "String")
-  private String rgnNm;
+  private String regionName;
 
   @Schema(description = "관광지명", type = "String")
   private String touristSiteName;
@@ -39,6 +39,9 @@ public class ResTouristSite {
 
   @Schema(description = "관광지태그리스트", type = "TouristSiteTag")
   private List<ResTouristSiteTag> touristSiteTagList;
+
+  @Schema(description = "추천관광지리스트", type = "ResRecommendTouristSite")
+  private List<ResRecommendTouristSite> recommendTouristSiteList;
 
 
 

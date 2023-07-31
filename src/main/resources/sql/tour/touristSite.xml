@@ -5,7 +5,7 @@
 <mapper namespace="com.cantaur.api.mapper.tour.TouristSiteMapper">
     <!-- 구군 정보조회    -->
     <select id="getRegionList" resultType="Region">
-        select /* com.whataulsan.whale.touristSite.mapper.TouristSiteMapper.getWhaleRegionList */
+        select /* com.cantaur.api.mapper.tour.TouristSiteMapper.getRegionList */
             region.region_code,
             region.region_name,
             region.tourist_site_uid
@@ -13,8 +13,8 @@
     </select>
 
     <!-- 관광지리스트 조회    -->
-    <select id="getTouristSiteList" resultType="com.cantaur.api.model.member.TouristSite">
-        select /* com.whataulsan.whale.touristSite.mapper.TouristSiteMapper.getTouristSiteList */
+    <select id="getTouristSiteList" parameterType="reqTouristSite" resultType="ResTouristSite">
+        select
             tourist_site.tourist_site_uid,
             tourist_site.tourist_site_name
         from ulsan_tour.tourist_site
@@ -23,8 +23,8 @@
 
 
     <!--    관광지 상세정보 조회-->
-    <select id="getTouristSite" parameterType="com.cantaur.api.model.member.TouristSite" resultType="com.cantaur.api.model.member.TouristSite">
-        select /* com.whataulsan.whale.touristSite.mapper.TouristSiteMapper.getTouristSite */
+    <select id="getTouristSite" parameterType="reqTouristSite" resultType="ResTouristSite">
+        select
             tourist_site.tourist_site_uid,
             tourist_site.tourist_site_name,
             tourist_site.region_code,
@@ -33,30 +33,31 @@
             tourist_site.represent_img_file_id
         from ulsan_tour.tourist_site
                  inner join ulsan_tour.region on region.region_code = tourist_site.region_code
-        where tourist_site.tourist_site_uid = #{turlsSn}
+        where tourist_site.tourist_site_uid = #{touristSiteUid}
     </select>
 
     <!--    관광지 태그 리스트 조회-->
-    <select id="getTouristSiteTagList" parameterType="com.cantaur.api.model.member.TouristSite" resultType="com.cantaur.api.model.member.Tag">
-        select /* com.whataulsan.whale.touristSite.mapper.TouristSiteMapper.getTouristSiteTagList */
+    <select id="getTouristSiteTagList" parameterType="ReqTouristSite" resultType="ResTouristSiteTag">
+        select
             tourist_site_tag.tourist_site_uid,
             tourist_site_tag.tag_uid,
             tag.tag_name,
             tourist_site_tag.sort_seq
         from ulsan_tour.tourist_site_tag
                  inner join ulsan_tour.tag on tourist_site_tag.tag_uid = tag.tag_uid
-        where tourist_site_tag.tourist_site_uid = #{turlsSn}
+        where tourist_site_tag.tourist_site_uid = #{touristSiteUid}
         order by tourist_site_tag.sort_seq
     </select>
 
     <!-- 추천 관광지리스트 조회    -->
-    <select id="getRecommendedTouristSiteList" resultType="com.cantaur.api.model.member.TouristSite">
-        select /* com.whataulsan.whale.touristSite.mapper.TouristSiteMapper.getRecommendedTouristSiteList */
+    <select id="getRecommendedTouristSiteList" parameterType="ReqTouristSite" resultType="ResRecommendTouristSite">
+        select
             tourist_site.tourist_site_uid,
             tourist_site.tourist_site_name,
             tourist_site.tourist_site_addr,
             tourist_site.represent_img_file_id
         from ulsan_tour.tourist_site
+       where region_code = #{regionCode}
     </select>
 
 

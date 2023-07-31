@@ -1,4 +1,4 @@
-package com.cantaur.api.model.member.res;
+package com.cantaur.api.model.tour.res;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

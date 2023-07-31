@@ -1,4 +1,4 @@
-package com.cantaur.api.model.member.req;
+package com.cantaur.api.model.tour.req;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,7 +1,8 @@
-package com.cantaur.api.touristsite.controller;
+package com.cantaur.api.controller;
 
-import com.cantaur.api.touristsite.service.TouristSiteService;
-import com.cantaur.api.touristsite.model.Region;
+import com.cantaur.api.model.SuccessResponse;
+import com.cantaur.api.model.member.Region;
+import com.cantaur.api.service.tour.TouristSiteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/cantaur/api/tourist")
@@ -25,16 +24,25 @@ public class TouristSiteController {
     final TouristSiteService touristSiteService;
 
 
+
+    /**
+     * 울산의 구군리스트를 조회합니다.
+     * @return SuccessResponse
+     */
     @GetMapping("/region")
     @Operation(summary = "구군 정보조회 조회", description = "구군 정보조회를 조회한다")
     @ApiResponse(
             responseCode = "200", description = "구군 정보조회 조회성공",
             content = @Content(schema = @Schema(implementation = Region.class)))
-    public List<Region> getRegionList(
+    public SuccessResponse getRegionList(
             @RequestHeader(name = "Accept-Language", defaultValue = "ko") String langCd
     ) {
-        log.info("ㅇ아아아ㅏ");
-        return touristSiteService.getRegionList();
+        return new SuccessResponse(touristSiteService.getRegionList());
     }
+
+
+
+
+
 
 }

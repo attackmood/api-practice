@@ -1,4 +1,4 @@
-package com.cantaur.api.touristsite.model;
+package com.cantaur.api.model.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;

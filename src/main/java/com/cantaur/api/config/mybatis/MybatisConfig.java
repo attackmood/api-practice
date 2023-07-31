@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import java.io.IOException;
 
 @org.springframework.context.annotation.Configuration
-@MapperScan(basePackages = "com.cantaur.api.**.mapper"
+@MapperScan(basePackages = "com.cantaur.api.mapper"
         , sqlSessionFactoryRef = "sqlSessionFactory")
 public class MybatisConfig {
 
@@ -24,7 +24,7 @@ public class MybatisConfig {
     protected String mapperLocationsPath;
 
 
-    private static final String TYPE_ALIASES_PACKAGE = "com.cantaur.api.**.model";
+    private static final String TYPE_ALIASES_PACKAGE = "com.cantaur.api.model";
 
     public MybatisConfig(DataSource dataSource){
         this.dataSource = dataSource;

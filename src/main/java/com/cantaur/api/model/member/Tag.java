@@ -1,4 +1,4 @@
-package com.cantaur.api.touristsite.model;
+package com.cantaur.api.model.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,20 +7,16 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "관광지 DTO")
+@Schema(description = "태그 DTO")
 @Getter
 @Setter
-public class TouristSite {
+public class Tag {
 
-  private Long touristSiteUid;
+  @Schema(description = "태그일련번호", type = "Long")
+  private Long tagUid;
 
-  private String regionCode;
-
-  private String touristSiteName;
-
-  private String touristSiteAddr;
-
-  private String representImgFileId;
+  @Schema(description = "태그명", type = "String")
+  private String tagName;
 
   @JsonIgnore
   private LocalDateTime createdAt;

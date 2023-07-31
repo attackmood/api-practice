@@ -27,6 +27,7 @@ dependencies {
 
 	implementation      'org.springdoc:springdoc-openapi-ui:1.6.12'
 	implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
+	implementation 'org.apache.commons:commons-collections4:4.4'
 
 
 

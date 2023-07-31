@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/cantaur/api/tourist")
 @Slf4j
-@Tag(name = "샘플", description = "기본 샘플 API")
+@Tag(name = "관광지", description = "관광지 정보 API")
 public class TouristSiteController {
     final TouristSiteService touristSiteService;
 

@@ -14,8 +14,6 @@ jobs:
         run: |
           pwd
           ls -al
-
-          cd ./packages/app
           touch .env.production
           echo REACT_APP_LOCAL111=${{ secrets.REACT_APP_LOCAL }} >> .env.production
           cat .env.production
@@ -24,7 +22,6 @@ jobs:
         run: |
           pwd
           ls -al
-          cd ./packages/app
           echo REACT_APP_LOCAL222=${{ secrets.REACT_APP_LOCAL }} >> .env.production
           cat .env.production
 

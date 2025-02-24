@@ -14,6 +14,7 @@ jobs:
         run: |
           pwd
           ls -al
+
           cd ./packages/app
           touch .env.production
           echo REACT_APP_LOCAL111=${{ secrets.REACT_APP_LOCAL }} >> .env.production

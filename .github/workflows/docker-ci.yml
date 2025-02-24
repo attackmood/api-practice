@@ -21,6 +21,9 @@ jobs:
 
       - name: 🏗️ Gradle 설정
         uses: gradle/actions/setup-gradle@v4  # Gradle 자동 설정 및 캐싱 활성화
+      - name: Set gradlew executable permission
+        run: chmod +x gradlew
+
 
       - name: 🔨 Spring Boot 빌드 (Gradle)
         run: ./gradlew build  # 공식 문서 방식 적용

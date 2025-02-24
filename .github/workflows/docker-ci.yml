@@ -16,4 +16,32 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: 🛑 레포지토리 체크아웃
+        uses: actions/checkout@v4  # GitHub 저장소에서 코드 가져오기
+
+      - name: ☕ Java 11 설정
+        uses: actions/setup-java@v4  # Java 17을 설정
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+      - name: 🏗️ Gradle 설정                                                                                                    
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: 🔨 Spring Boot 빌드 (Gradle)
+        run: ./gradlew clean build
+
+      - name: 📦 빌드된 JAR 저장 (선택사항)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Package
+          path: build/libs
+
+      - name: 🏗️ Docker 빌드
+        run: docker build -t my-dockerhub-id/my-app:latest .
+
+      - name: 🔑 Docker Hub 로그인
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: 🚀 Docker Hub에 푸시
+        run: docker push my-dockerhub-id/my-app:latest
 

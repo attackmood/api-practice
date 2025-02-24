@@ -2,46 +2,35 @@ name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  working-directory-test:
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./packages/app
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: 'Create env file111'
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
-      - name: 🛑 레포지토리 체크아웃
-        uses: actions/checkout@v4  # GitHub 저장소에서 코드 가져오기
+          pwd
+          ls -al
+          cd ./packages/app
+          touch .env.production
+          echo REACT_APP_LOCAL111=${{ secrets.REACT_APP_LOCAL }} >> .env.production
+          cat .env.production
 
-      - name: ☕ Java 11 설정
-        uses: actions/setup-java@v4  # Java 17을 설정
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-      - name: 🏗️ Gradle 설정                                                                                                    
-        uses: gradle/actions/setup-gradle@v4
+      - name: 'Create env file222'
+        run: |
+          pwd
+          ls -al
+          cd ./packages/app
+          echo REACT_APP_LOCAL222=${{ secrets.REACT_APP_LOCAL }} >> .env.production
+          cat .env.production
 
-      - name: 🔨 Spring Boot 빌드 (Gradle)
-        run: ./gradlew clean build
-
-      - name: 📦 빌드된 JAR 저장 (선택사항)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Package
-          path: build/libs
-
-      - name: 🏗️ Docker 빌드
-        run: docker build -t my-dockerhub-id/my-app:latest .
-
-      - name: 🔑 Docker Hub 로그인
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: 🚀 Docker Hub에 푸시
-        run: docker push my-dockerhub-id/my-app:latest
-
+      - name: 'Create env file333'
+        working-directory: /packages/app
+        run: |
+          pwd
+          ls -al
+          echo REACT_APP_LOCAL333=${{ secrets.REACT_APP_LOCAL }} >> .env.production
+          cat .env.production

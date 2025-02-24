@@ -13,24 +13,31 @@ jobs:
       - name: 'Create env file111'
         run: |
           pwd
-          ls -al
           cd ./packages/app
           touch .env.production
           echo REACT_APP_LOCAL111=${{ secrets.REACT_APP_LOCAL }} >> .env.production
+          pwd
+          ls -al
           cat .env.production
+
 
       - name: 'Create env file222'
         run: |
           pwd
-          ls -al
           cd ./packages/app
+          touch .env.production
           echo REACT_APP_LOCAL222=${{ secrets.REACT_APP_LOCAL }} >> .env.production
+          pwd
+          ls -al
           cat .env.production
 
+
       - name: 'Create env file333'
-        working-directory: /packages/app
+        working-directory: ${{ env.working-directory }}
         run: |
+          echo  env.working-directory=${{ env.working-directory }}
           pwd
           ls -al
           echo REACT_APP_LOCAL333=${{ secrets.REACT_APP_LOCAL }} >> .env.production
           cat .env.production
+

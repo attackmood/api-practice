@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-class TourApiApplicationTests {
+class DemoApiApplicationTests {
 
 	@Autowired
 	private ApplicationContext applicationContext;

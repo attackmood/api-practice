@@ -19,9 +19,9 @@ jobs:
       - name: 🧐 Verify Java Version
         run: java -version
 
-      # 📌 2️⃣ 기존 JDK 제거
-      - name: 🗑️ Remove default JDK (if any)
-        run: sudo apt-get remove -y java-common default-jdk
+      # # 📌 2️⃣ 기존 JDK 제거
+      # - name: 🗑️ Remove default JDK (if any)
+      #   run: sudo apt-get remove -y java-common default-jdk
 
       # 📌 3️⃣ JDK 17 설치
       - name: ⚙️ Set up JDK 17
@@ -87,7 +87,7 @@ jobs:
           docker rm my-app || true
       
           # 새로운 컨테이너 실행
-          docker run -d --name my-app -p 8081:8081 --network my-network \
+          docker run -d --name my-app -p 8081:8081 --network action-study_my-network \
             --restart always ${{ secrets.DOCKER_USERNAME }}/my-app:latest
       
           # 불필요한 이미지 삭제 (디스크 공간 절약)

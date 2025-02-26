@@ -1,44 +1,80 @@
-name: Docker CI/CD
+name: 🚀 Deploy Spring Boot App
 
 on:
   push:
     branches:
-      - master  # main 브랜치에 push될 때 실행
-
+      - main  # ✅ main 브랜치에 코드가 푸시되면 실행
+permissions:
+  contents: read
+  
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest  # GitHub Actions에서 사용할 OS 환경
+  build-and-deploy:
+    runs-on: ubuntu-latest  # 💻 GitHub Actions 실행 환경
 
     steps:
-      - name: 🛑 레포지토리 체크아웃
-        uses: actions/checkout@v4  # GitHub 저장소에서 코드 가져오기
+      # 📌 1️⃣ 코드 체크아웃
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
 
-      - name: ☕ Java 17 설정
-        uses: actions/setup-java@v4  # Java 17을 설정
+      # 📌 2️⃣ JDK 17 설정
+      - name: ⚙️ Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          java-version: '11'
           distribution: 'temurin'
+          java-version: '17'
 
-      - name: 🏗️ Gradle 설정
-        uses: gradle/actions/setup-gradle@v4  # Gradle 자동 설정 및 캐싱 활성화
-      - name: Set gradlew executable permission
-        run: chmod +x gradlew
-
-
-      - name: 🔨 Spring Boot 빌드 (Gradle)
-        run: ./gradlew build  # 공식 문서 방식 적용
-
-      - name: 📦 빌드된 JAR 저장 (선택 사항)
-        uses: actions/upload-artifact@v4
+      # 📌 3️⃣ Gradle 캐싱 (빌드 속도 최적화)
+      - name: 💾 Cache Gradle dependencies
+        uses: actions/cache@v3
         with:
-          name: Package
-          path: build/libs/*.jar  # 빌드된 JAR을 GitHub Actions에 업로드
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-      - name: 🏗️ Docker 빌드
-        run: docker build -t my-dockerhub-id/my-app:latest .
+     # 📌 4️⃣ 환경별 application.yml 파일 생성
+      - name: 📝 Generate application.yml files
+        run: |
+          # resources 폴더 생성
+          mkdir -p ./src/main/resources
+          
+          # 기본 application.yml 생성 (main, develop 공통)
+          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "${{ secrets.YML }}" > ./src/main/resources/application.yml
+          fi
 
-      - name: 🔑 Docker Hub 로그인
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          # 개발 환경 (develop 브랜치)
+          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "${{ secrets.YML_DEV }}" > ./src/main/resources/application-dev.yml
+          fi
 
-      - name: 🚀 Docker Hub에 푸시
-        run: docker push my-dockerhub-id/my-app:latest
+          # 운영 환경 (main 브랜치)
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "${{ secrets.YML_PROD }}" > ./src/main/resources/application-prod.yml
+          fi
+        shell: bash
+
+      # 📌 5️⃣ Gradle 빌드 실행 (JAR 생성)
+      - name: 🏗️ Build with Gradle
+        run: gradle clean bootJar --no-daemon
+
+      # 📌 6️⃣ Docker 이미지 빌드 & Docker Hub에 푸시
+      - name: 🐳 Build and Push Docker Image
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker build --build-arg JAR_FILE=build/libs/demo.jar -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+
+      # 📌 7️⃣ 서버에 배포 (SSH 연결)
+      - name: 🚀 Deploy to Server
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+            docker-compose down
+            docker-compose up -d

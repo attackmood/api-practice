@@ -3,7 +3,7 @@ name: 🚀 Deploy Spring Boot App
 on:
   push:
     branches:
-      - main  # ✅ main 브랜치에 코드가 푸시되면 실행
+      - master  # ✅ master 브랜치에 코드가 푸시되면 실행
 permissions:
   contents: read
   

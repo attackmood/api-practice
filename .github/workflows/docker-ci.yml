@@ -15,13 +15,22 @@ jobs:
       # 📌 1️⃣ 코드 체크아웃
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
+      # 📌 4️⃣ JDK 버전 확인
+      - name: 🧐 Verify Java Version
+        run: java -version
 
-      # 📌 2️⃣ JDK 17 설정
+      # 📌 2️⃣ 기존 JDK 제거
+      - name: 🗑️ Remove default JDK (if any)
+        run: sudo apt-get remove -y java-common default-jdk
+
+      # 📌 3️⃣ JDK 17 설치
       - name: ⚙️ Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+          check-latest: true
+
 
       # 📌 3️⃣ Gradle 캐싱 (빌드 속도 최적화)
       - name: 💾 Cache Gradle dependencies

@@ -80,31 +80,31 @@ jobs:
       - name: 🚀 Deploy to Local Server
         run: |
           # 최신 이미지 Pull
-          docker pull ***/my-app:latest
-          
+          docker pull cantaur/my-app:latest
+
           # 기존 컨테이너가 존재하면 중지 및 삭제 (없어도 에러 발생하지 않도록)
           if [ "$(docker ps -aq -f name=springboot-app)" ]; then
             docker stop springboot-app || true
             docker rm springboot-app || true
-          fi  # ← ✅ if 문 닫기
-          
+          fi
+
           # 현재 네트워크 이름 확인 (출력 후 변수에 저장)
           NETWORK_NAME=$(docker network ls --format '{{.Name}}' | grep my-network)
           echo "Detected network: $NETWORK_NAME"
-          
+
           # 새로운 컨테이너 실행 (기존 네트워크 유지)
           docker run -d --name springboot-app \
             -p 8081:8080 \
             --network "$NETWORK_NAME" \
             --restart always \
-            ***/my-app:latest
-          
+            cantaur/my-app:latest
+
           # 네트워크 연결이 안 된 경우 강제 연결 (컨테이너가 존재하는지 먼저 확인)
           if [ "$(docker ps -aq -f name=springboot-app)" ]; then
             docker network inspect "$NETWORK_NAME" | grep springboot-app || \
             docker network connect "$NETWORK_NAME" springboot-app
-          fi  # ← ✅ if 문 닫기
-          
+          fi
+
           # 불필요한 이미지 삭제 (디스크 공간 절약)
           docker image prune -f
 

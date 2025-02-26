@@ -103,7 +103,6 @@ jobs:
           if [ "$(docker ps -aq -f name=springboot-app)" ]; then
             docker network inspect "$NETWORK_NAME" | grep springboot-app || \
             docker network connect "$NETWORK_NAME" springboot-app
-          fi
 
           # 불필요한 이미지 삭제 (디스크 공간 절약)
           docker image prune -f

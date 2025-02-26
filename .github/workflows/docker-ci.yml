@@ -76,21 +76,33 @@ jobs:
           docker build --build-arg JAR_FILE=build/libs/demo.jar -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
 
-      # 📌 7️⃣ 로컬 서버에 배포
+      # 📌 7️⃣ 최신 Docker 이미지 Pull & Spring Boot 컨테이너 재배포
       - name: 🚀 Deploy to Local Server
         run: |
-          # 최신 Docker 이미지 Pull
+          # 최신 이미지 Pull
           docker pull ${{ secrets.DOCKER_USERNAME }}/my-app:latest
-      
-          # 기존 컨테이너 정리
-          docker stop my-app || true
-          docker rm my-app || true
-      
-          # 새로운 컨테이너 실행
-          docker run -d --name my-app -p 8081:8081 --network action-study_my-network \
-            --restart always ${{ secrets.DOCKER_USERNAME }}/my-app:latest
-      
+
+          # 기존 컨테이너 중지 및 삭제
+          docker stop springboot-app || true
+          docker rm springboot-app || true
+
+          # 현재 네트워크 이름 확인 (출력 후 변수에 저장)
+          NETWORK_NAME=$(docker network ls --format '{{.Name}}' | grep my-network)
+          echo "Detected network: $NETWORK_NAME"
+
+          # 새로운 컨테이너 실행 (기존 네트워크 유지)
+          docker run -d --name springboot-app \
+            -p 8081:8080 \
+            --network "$NETWORK_NAME" \
+            --restart always \
+            ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+
+          # 네트워크 연결이 안 된 경우 강제 연결
+          docker network inspect "$NETWORK_NAME" | grep springboot-app || \
+          docker network connect "$NETWORK_NAME" springboot-app
+
           # 불필요한 이미지 삭제 (디스크 공간 절약)
           docker image prune -f
+
 
 

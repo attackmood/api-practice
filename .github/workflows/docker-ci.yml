@@ -86,7 +86,7 @@ jobs:
           if [ "$(docker ps -aq -f name=springboot-app)" ]; then
             docker stop springboot-app || true
             docker rm springboot-app || true
-          fi
+    
 
           # 현재 네트워크 이름 확인 (출력 후 변수에 저장)
           NETWORK_NAME=$(docker network ls --format '{{.Name}}' | grep my-network)

@@ -76,16 +76,21 @@ jobs:
           docker build --build-arg JAR_FILE=build/libs/demo.jar -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
 
-      # 📌 7️⃣ 서버에 배포 (SSH 연결)
+      # 📌 7️⃣ 로컬 서버에 배포
       - name: 🚀 Deploy to Local Server
-        uses: appleboy/ssh-action@v0.1.4
-        with:
-          host: localhost
-          username: kaeun0320  # 로컬 사용자 이름
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
-          script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/my-app:latest
-            docker-compose down
-            docker-compose up -d
+        run: |
+          # 최신 Docker 이미지 Pull
+          docker pull ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+      
+          # 기존 컨테이너 정리
+          docker stop my-app || true
+          docker rm my-app || true
+      
+          # 새로운 컨테이너 실행
+          docker run -d --name my-app -p 8081:8081 --network my-network \
+            --restart always ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+      
+          # 불필요한 이미지 삭제 (디스크 공간 절약)
+          docker image prune -f
+
 

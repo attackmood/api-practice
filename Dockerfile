@@ -1,13 +1,10 @@
-# Stage 1: Build Stage using Gradle 7.6.1 with JDK 17
-FROM gradle:7.6.1-jdk17 AS builder
-WORKDIR /home/gradle/project
-COPY --chown=gradle:gradle . .
-RUN gradle clean bootJar --no-daemon
-
-# Stage 2: Runtime Stage using OpenJDK 17
+# Stage 1 제거 (GitHub Actions에서 빌드했으므로 필요 없음)
 FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY --from=builder /home/gradle/project/build/libs/demo.jar app.jar
+
+# GitHub Actions에서 빌드한 JAR 파일을 전달받아 실행
+ARG JAR_FILE
+COPY ${JAR_FILE} app.jar
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
-

@@ -6,7 +6,7 @@ on:
       - master  # ✅ master 브랜치에 코드가 푸시되면 실행
 permissions:
   contents: read
-  
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest  # 💻 GitHub Actions 실행 환경
@@ -15,13 +15,10 @@ jobs:
       # 📌 1️⃣ 코드 체크아웃
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
+
       # 📌 4️⃣ JDK 버전 확인
       - name: 🧐 Verify Java Version
         run: java -version
-
-      # # 📌 2️⃣ 기존 JDK 제거
-      # - name: 🗑️ Remove default JDK (if any)
-      #   run: sudo apt-get remove -y java-common default-jdk
 
       # 📌 3️⃣ JDK 17 설치
       - name: ⚙️ Set up JDK 17
@@ -43,67 +40,38 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-     # 📌 4️⃣ 환경별 application.yml 파일 생성
-      - name: 📝 Generate application.yml files
-        run: |
-          # resources 폴더 생성
-          mkdir -p ./src/main/resources
-          
-          # 기본 application.yml 생성 (main, develop 공통)
-          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/develop" ]]; then
-            echo "${{ secrets.YML }}" > ./src/main/resources/application.yml
-          fi
-
-          # 개발 환경 (develop 브랜치)
-          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-            echo "${{ secrets.YML_DEV }}" > ./src/main/resources/application-dev.yml
-          fi
-
-          # 운영 환경 (main 브랜치)
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "${{ secrets.YML_PROD }}" > ./src/main/resources/application-prod.yml
-          fi
-        shell: bash
-
       # 📌 5️⃣ Gradle 빌드 실행 (JAR 생성)
       - name: 🏗️ Build with Gradle
         run: gradle clean bootJar --no-daemon
 
-      # 📌 6️⃣ Docker 이미지 빌드 & Docker Hub에 푸시
-      - name: 🐳 Build and Push Docker Image
+      # 5) Docker 레지스트리(예: GHCR) 로그인 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+
+      # 4) Docker 이미지 빌드
+      - name: Build Docker Image
         run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker build --build-arg JAR_FILE=build/libs/demo.jar -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+          docker build \
+            --build-arg JAR_FILE=build/libs/app.jar \
+            -t ghcr.io/attackmood/my-app:latest .
 
-      # 📌 7️⃣ 최신 Docker 이미지 Pull & Spring Boot 컨테이너 재배포
-      - name: 🚀 Deploy to Local Server
+      - name: Push Docker Image
         run: |
-          # 최신 이미지 Pull
-          docker pull cantaur/my-app:latest
+          docker push ghcr.io/attackmood/my-app:latest
 
-          # 기존 컨테이너가 존재하면 중지 및 삭제 (없어도 에러 발생하지 않도록)
-          if [ "$(docker ps -aq -f name=springboot-app)" ]; then
-            docker stop springboot-app || true
-            docker rm springboot-app || true
-          fi
-
-          # 현재 네트워크 이름 확인 (출력 후 변수에 저장)
-          NETWORK_NAME=$(docker network ls --format '{{.Name}}' | grep my-network)
-          echo "Detected network: $NETWORK_NAME"
-
-          # 새로운 컨테이너 실행 (기존 네트워크 유지)
-          docker run -d --name springboot-app \
-            -p 8081:8080 \
-            --network "$NETWORK_NAME" \
-            --restart always \
-            cantaur/my-app:latest
-
-          # 네트워크 연결이 안 된 경우 강제 연결 (컨테이너가 존재하는지 먼저 확인)
-          if [ "$(docker ps -aq -f name=springboot-app)" ]; then
-            docker network inspect "$NETWORK_NAME" | grep springboot-app || \
-            docker network connect "$NETWORK_NAME" springboot-app
-          fi
-
-          # 불필요한 이미지 삭제 (디스크 공간 절약)
-          docker image prune -f
+      # 6) 원격 서버로 SSH 접속 -> docker-compose pull, up -d
+      # - name: Deploy to Server
+      #   uses: appleboy/ssh-action@v0.1.16
+      #   with:
+      #     host: ${{ secrets.REMOTE_HOST }}
+      #     username: ${{ secrets.REMOTE_USER }}
+      #     key: ${{ secrets.SSH_KEY }}
+      #     script: |
+      #       cd /home/ubuntu/my-deploy-dir  # docker-compose.yml이 있는 폴더
+      #       docker-compose pull app
+      #       docker-compose up -d app

@@ -57,7 +57,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            --build-arg JAR_FILE=build/libs/app.jar \
+            --build-arg JAR_FILE=build/libs/demo.jar \
             -t ghcr.io/attackmood/my-app:latest .
 
       - name: Push Docker Image

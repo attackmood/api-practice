@@ -8,6 +8,6 @@ ARG JAR_FILE
 COPY ${JAR_FILE} app.jar
 
 # 외부에서 접근할 포트
-EXPOSE 8080트
+EXPOSE 8080
 # 컨테이너 시작 시 스프링부트 실행
 ENTRYPOINT ["java", "-jar", "app.jar"]

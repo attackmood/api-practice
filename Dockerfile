@@ -4,7 +4,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # GitHub Actions에서 빌드한 JAR 파일을 전달받아 실행
-COPY build/libs/app.jar app.jar
+COPY build/libs/demo.jar app.jar
 
 # 외부에서 접근할 포트
 EXPOSE 8080

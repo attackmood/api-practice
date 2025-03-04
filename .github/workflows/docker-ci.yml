@@ -60,13 +60,12 @@ jobs:
           docker push ghcr.io/${{ github.repository_owner }}/my-app:latest
 
       # 6) 원격 서버로 SSH 접속 -> docker-compose pull, up -d
-      # - name: Deploy to Server
-      #   uses: appleboy/ssh-action@v0.1.16
-      #   with:
-      #     host: ${{ secrets.REMOTE_HOST }}
-      #     username: ${{ secrets.REMOTE_USER }}
-      #     key: ${{ secrets.SSH_KEY }}
-      #     script: |
-      #       cd /home/ubuntu/my-deploy-dir  # docker-compose.yml이 있는 폴더
-      #       docker-compose pull app
-      #       docker-compose up -d app
+      - name: Deploy to CentOS Server (using password)
+        run: |
+          sudo yum install -y sshpass
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" \
+            ssh -p ${{SERVER_PORT}} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} \
+            "cd /home/kaeun/workspace/action-practice \
+             && docker pull ghcr.io/${{ github.repository_owner }}/my-app:latest \
+             && docker compose down \
+             && docker compose up -d"

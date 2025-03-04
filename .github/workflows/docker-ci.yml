@@ -24,7 +24,6 @@ jobs:
           java-version: '17'
           check-latest: true
 
-
       # 📌 3️⃣ Gradle 캐싱 (빌드 속도 최적화)
       - name: 💾 Cache Gradle dependencies
         uses: actions/cache@v3
@@ -36,7 +35,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 📌 4️⃣ Gradle 빌드드
+      # 📌 4️⃣ Gradle 빌드
       - name: 🏗️ Build with Gradle
         run: gradle clean bootJar --no-daemon
 
@@ -48,8 +47,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-
-      # 4) Docker 이미지 빌드
+      # 📌 6️⃣ Docker 이미지 빌드(Dockerfile)
       - name: Build Docker Image
         run: |
           docker build \
@@ -59,14 +57,14 @@ jobs:
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/my-app:latest
 
-      # 6) 원격 서버로 SSH 접속 -> docker-compose pull, up -d
+      # 📌7️⃣ 원격 서버로 SSH 접속 -> docker-compose pull, up -d
       - name: Deploy to CentOS Server (using password)
         run: |
           sudo apt-get update
           sudo apt-get install -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" \
             ssh -p ${{ secrets.SERVER_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} \
-            "cd /home/kaeun/workspace/action-practice \
+            "cd ${{ secrets.SERVER_WORK_DIR }} \
              && docker pull ghcr.io/${{ github.repository_owner }}/my-app:latest \
              && docker compose down \
              && docker compose up -d"
